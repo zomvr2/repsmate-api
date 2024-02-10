@@ -62,6 +62,26 @@ app.get("/search", async (req, res) => {
   }
 });
 
+// Add this route to your express app
+app.get("/random", async (req, res) => {
+  const url = `${baseUrl}/dist/exercises.json`;
+
+  try {
+    const response = await axios.get(url);
+    const exercises = response.data;
+
+    // Generate 5 random indices
+    const indices = Array.from({ length: 5 }, () => Math.floor(Math.random() * exercises.length));
+
+    // Select exercises with these indices
+    const randomExercises = indices.map(index => exercises[index]);
+
+    res.json(randomExercises);
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  }
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
