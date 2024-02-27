@@ -57,10 +57,16 @@ app.get("/exercise/:id", async (req, res) => {
  * @param {Object} res - The response object.
  * @example GET /search?name=pushup&page=1
  * Sample URL: http://localhost:3000/search?name=pushup&page=1
+ * Sample ULR: http://localhost:3000/search?name=pushup&page=1&force=push
  */
 app.get("/search", async (req, res) => {
   const name = req.query.name;
   const page = req.query.page || 1;
+  const force = req.query.force;
+  const level = req.query.level;
+  const mechanic = req.query.mechanic;
+  const equipment = req.query.equipment;
+  const category = req.query.category;
 
   try {
     const response = await axios.get(url);
@@ -70,7 +76,25 @@ app.get("/search", async (req, res) => {
       keys: ["name"],
     });
 
-    const result = fuse.search(name);
+    let result = fuse.search(name);
+
+    // Apply filters
+    if (force) {
+      result = result.filter(item => item.item.force === force);
+    }
+    if (level) {
+      result = result.filter(item => item.item.level === level);
+    }
+    if (mechanic) {
+      result = result.filter(item => item.item.mechanic === mechanic);
+    }
+    if (equipment) {
+      result = result.filter(item => item.item.equipment === equipment);
+    }
+    if (category) {
+      result = result.filter(item => item.item.category === category);
+    }
+
     const start = (page - 1) * 10;
     const end = start + 10;
     const data = result.slice(start, end);
